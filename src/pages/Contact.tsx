@@ -34,13 +34,14 @@ const Contact = () => {
               </CardHeader>
               <CardContent>
                 <address className="not-italic text-muted-foreground">
-                  123 Korean Street<br />
-                  Downtown District<br />
-                  City, State 12345<br />
-                  United States
+                  1/95 Gorge Rd<parameter name="new_content">              <CardContent>
+                <address className="not-italic text-muted-foreground">
+                  1/95 Gorge Rd<br />
+                  Adelaide, SA<br />
+                  Australia
                 </address>
-                <Button variant="outline" className="mt-4 w-full">
-                  Get Directions
+                <Button asChild variant="outline" className="mt-4 w-full">
+                  <a href="https://www.google.com/maps/search/?api=1&query=1%2F95+Gorge+Rd" target="_blank" rel="noreferrer">Get Directions</a>
                 </Button>
               </CardContent>
             </Card>
