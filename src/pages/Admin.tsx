@@ -29,13 +29,13 @@ const Admin = () => {
   };
   useEffect(() => { load(); }, []);
 
-  const updateOrder = async (id: string, status: string) => {
+  const updateOrder = async (id: string, status: typeof ORDER_STATUSES[number]) => {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Order updated");
     load();
   };
-  const updateReservation = async (id: string, status: string) => {
+  const updateReservation = async (id: string, status: typeof RES_STATUSES[number]) => {
     const { error } = await supabase.from("reservations").update({ status }).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Reservation updated");
