@@ -32,8 +32,19 @@ const Admin = () => {
     setOrders(o.data ?? []);
     setReservations(r.data ?? []);
     setUsers(u.data ?? []);
+    const counts = new Map<string, number>();
+    (o.data ?? []).forEach((ord: any) => (ord.order_items ?? []).forEach((it: any) =>
+      counts.set(it.name, (counts.get(it.name) ?? 0) + (it.quantity ?? 1))
+    ));
+    setPopular([...counts.entries()].map(([name, qty]) => ({ name, qty })).sort((a, b) => b.qty - a.qty).slice(0, 5));
   };
   useEffect(() => { load(); }, []);
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success("Signed out");
+    navigate("/");
+  };
 
   const updateOrder = async (id: string, status: typeof ORDER_STATUSES[number]) => {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
@@ -55,7 +66,10 @@ const Admin = () => {
     <div className="min-h-screen">
       <Navigation />
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8 elegant-text">Admin Dashboard</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-bold elegant-text">Admin Dashboard</h1>
+          <Button variant="outline" onClick={handleLogout}><LogOut className="h-4 w-4 mr-2" />Sign out</Button>
+        </div>
 
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Total Revenue</p><p className="text-3xl font-bold text-accent">${revenue.toFixed(2)}</p></CardContent></Card>
