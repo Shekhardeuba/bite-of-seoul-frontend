@@ -34,8 +34,6 @@ const Contact = () => {
               </CardHeader>
               <CardContent>
                 <address className="not-italic text-muted-foreground">
-                  1/95 Gorge Rd<parameter name="new_content">              <CardContent>
-                <address className="not-italic text-muted-foreground">
                   1/95 Gorge Rd<br />
                   Adelaide, SA<br />
                   Australia
