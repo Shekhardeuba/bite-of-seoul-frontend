@@ -1,21 +1,27 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { LogOut } from "lucide-react";
 
 const ORDER_STATUSES = ["received", "preparing", "ready", "delivered", "cancelled"] as const;
 const RES_STATUSES = ["pending", "confirmed", "completed", "cancelled"] as const;
 
 const Admin = () => {
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [orders, setOrders] = useState<any[]>([]);
   const [reservations, setReservations] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  const [popular, setPopular] = useState<{ name: string; qty: number }[]>([]);
 
   const load = async () => {
     const [o, r, u] = await Promise.all([
