@@ -1,21 +1,27 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { LogOut } from "lucide-react";
 
 const ORDER_STATUSES = ["received", "preparing", "ready", "delivered", "cancelled"] as const;
 const RES_STATUSES = ["pending", "confirmed", "completed", "cancelled"] as const;
 
 const Admin = () => {
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [orders, setOrders] = useState<any[]>([]);
   const [reservations, setReservations] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  const [popular, setPopular] = useState<{ name: string; qty: number }[]>([]);
 
   const load = async () => {
     const [o, r, u] = await Promise.all([
@@ -26,8 +32,19 @@ const Admin = () => {
     setOrders(o.data ?? []);
     setReservations(r.data ?? []);
     setUsers(u.data ?? []);
+    const counts = new Map<string, number>();
+    (o.data ?? []).forEach((ord: any) => (ord.order_items ?? []).forEach((it: any) =>
+      counts.set(it.name, (counts.get(it.name) ?? 0) + (it.quantity ?? 1))
+    ));
+    setPopular([...counts.entries()].map(([name, qty]) => ({ name, qty })).sort((a, b) => b.qty - a.qty).slice(0, 5));
   };
   useEffect(() => { load(); }, []);
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success("Signed out");
+    navigate("/");
+  };
 
   const updateOrder = async (id: string, status: typeof ORDER_STATUSES[number]) => {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
@@ -49,7 +66,10 @@ const Admin = () => {
     <div className="min-h-screen">
       <Navigation />
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8 elegant-text">Admin Dashboard</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-bold elegant-text">Admin Dashboard</h1>
+          <Button variant="outline" onClick={handleLogout}><LogOut className="h-4 w-4 mr-2" />Sign out</Button>
+        </div>
 
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Total Revenue</p><p className="text-3xl font-bold text-accent">${revenue.toFixed(2)}</p></CardContent></Card>
@@ -64,6 +84,7 @@ const Admin = () => {
             <TabsTrigger value="reservations">Reservations</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="recent">Recent</TabsTrigger>
+            <TabsTrigger value="popular">Popular items</TabsTrigger>
           </TabsList>
 
           <TabsContent value="orders" className="space-y-3">
@@ -112,6 +133,17 @@ const Admin = () => {
             {recentOrders.map(o => (
               <Card key={o.id}><CardContent className="p-4">
                 <div className="flex justify-between"><span>${Number(o.total).toFixed(2)}</span><Badge>{o.status}</Badge></div>
+              </CardContent></Card>
+            ))}
+          </TabsContent>
+
+          <TabsContent value="popular" className="space-y-3">
+            {popular.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No order data yet.</p>
+            ) : popular.map(p => (
+              <Card key={p.name}><CardContent className="p-4 flex justify-between">
+                <span className="font-semibold">{p.name}</span>
+                <Badge>{p.qty} sold</Badge>
               </CardContent></Card>
             ))}
           </TabsContent>

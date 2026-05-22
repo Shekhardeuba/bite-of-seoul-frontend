@@ -14,6 +14,9 @@ import Contact from "./pages/Contact";
 import Reviews from "./pages/Reviews";
 import Gallery from "./pages/Gallery";
 import Auth from "./pages/Auth";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import AdminLogin from "./pages/AdminLogin";
 import ResetPassword from "./pages/ResetPassword";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
@@ -41,6 +44,9 @@ const App = () => (
               <Route path="/reviews" element={<Reviews />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />

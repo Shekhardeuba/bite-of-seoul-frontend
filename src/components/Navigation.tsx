@@ -69,7 +69,7 @@ const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/auth"><Button size="sm">Sign in</Button></Link>
+              <Link to="/login"><Button size="sm">Sign in</Button></Link>
             )}
           </div>
         </div>
