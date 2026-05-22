@@ -97,32 +97,6 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="py-16 bg-secondary/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-8 elegant-text">
-              Find Us
-            </h2>
-            
-            {/* Google Maps Placeholder */}
-            <Card className="overflow-hidden">
-              <div className="aspect-video bg-muted flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <div className="text-4xl">🗺️</div>
-                  <h3 className="text-xl font-semibold text-primary">Interactive Map</h3>
-                  <p className="text-muted-foreground max-w-md">
-                    Google Maps integration will be added here to show our exact location and provide directions.
-                  </p>
-                  <Button variant="outline">
-                    Open in Google Maps
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* Additional Services */}
       <section className="py-16">
