@@ -1,16 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { LogOut } from "lucide-react";
+import { LogOut, DollarSign, ShoppingBag, CalendarDays, Users } from "lucide-react";
+import {
+  ResponsiveContainer, LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, Tooltip, CartesianGrid, Legend,
+} from "recharts";
+
 
 const ORDER_STATUSES = ["received", "preparing", "ready", "delivered", "cancelled"] as const;
 const RES_STATUSES = ["pending", "confirmed", "completed", "cancelled"] as const;
