@@ -67,18 +67,29 @@ const Menu = () => {
       </section>
 
       {featured.length > 0 && (
-        <section className="py-10 bg-card/30">
+        <section className="py-12 bg-card/30">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-6">⭐ Featured</h2>
+            <h2 className="text-3xl font-bold mb-8 text-center">⭐ Chef's Featured</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {featured.map(item => (
-                <Card key={item.id} className="food-card-hover overflow-hidden border-primary/30">
+                <Card key={item.id} className="food-card-hover overflow-hidden border-primary/30 group">
+                  <div className="relative h-56 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20">
+                    {item.image_url ? (
+                      <img src={item.image_url} alt={item.name} loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-6xl">🍽️</div>
+                    )}
+                    <div className="absolute top-3 right-3">
+                      <Badge className="bg-primary text-primary-foreground">Featured</Badge>
+                    </div>
+                  </div>
                   <CardContent className="p-6">
-                    <h3 className="text-xl font-bold text-primary">{item.name}</h3>
+                    <h3 className="text-xl font-bold text-primary">{item.name} {item.spicy && "🌶️"}</h3>
                     <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{item.description}</p>
                     <div className="flex justify-between items-center mt-4">
                       <span className="text-2xl font-bold text-accent">${Number(item.price).toFixed(2)}</span>
-                      <Button size="sm" onClick={() => addToCart(item.id)}><Plus className="h-4 w-4" />Add</Button>
+                      <Button size="sm" onClick={() => addToCart(item.id)}><Plus className="h-4 w-4 mr-1" />Add</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -87,6 +98,7 @@ const Menu = () => {
           </div>
         </section>
       )}
+
 
       <section className="py-8 bg-card/50 border-y border-border sticky top-16 z-30 backdrop-blur-md">
         <div className="container mx-auto px-4 space-y-4">
