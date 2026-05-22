@@ -84,6 +84,7 @@ const Admin = () => {
             <TabsTrigger value="reservations">Reservations</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="recent">Recent</TabsTrigger>
+            <TabsTrigger value="popular">Popular items</TabsTrigger>
           </TabsList>
 
           <TabsContent value="orders" className="space-y-3">
