@@ -39,7 +39,7 @@ const Signup = () => {
     });
     setLoading(false);
     if (error) return toast.error(error.message);
-    toast.success("Account created! Check your email to confirm, then sign in.");
+    toast.success("Account created! You can now sign in.");
     navigate("/login");
   };
 
