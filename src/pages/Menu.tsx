@@ -123,15 +123,28 @@ const Menu = () => {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map(item => (
-                <Card key={item.id} className="food-card-hover overflow-hidden">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-xl font-bold">{item.name} {item.spicy && "🌶️"}</h3>
-                      <button onClick={() => toggleFavorite(item.id)}>
-                        <Heart className={`h-5 w-5 ${favorites.includes(item.id) ? "fill-primary text-primary" : "text-muted-foreground"}`} />
-                      </button>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">{item.description}</p>
+                <Card key={item.id} className="food-card-hover overflow-hidden group">
+                  <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/15 to-accent/15">
+                    {item.image_url ? (
+                      <img src={item.image_url} alt={item.name} loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-5xl opacity-60">🍱</div>
+                    )}
+                    <button
+                      onClick={() => toggleFavorite(item.id)}
+                      className="absolute top-3 right-3 h-9 w-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors"
+                      aria-label="Toggle favorite"
+                    >
+                      <Heart className={`h-4 w-4 ${favorites.includes(item.id) ? "fill-primary text-primary" : "text-muted-foreground"}`} />
+                    </button>
+                    {item.spicy && (
+                      <Badge className="absolute top-3 left-3 bg-destructive text-destructive-foreground">🌶️ Spicy</Badge>
+                    )}
+                  </div>
+                  <CardContent className="p-5">
+                    <h3 className="text-lg font-bold">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2 min-h-[2.5rem]">{item.description}</p>
                     <div className="flex gap-1 mt-3 flex-wrap">
                       {item.dietary_tags?.map(t => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
                     </div>
@@ -143,6 +156,7 @@ const Menu = () => {
                 </Card>
               ))}
             </div>
+
           )}
           {filtered.length === 0 && !loading && (
             <p className="text-center text-muted-foreground">No items found.</p>
