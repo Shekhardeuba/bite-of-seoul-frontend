@@ -1,151 +1,143 @@
+import { useEffect, useState, useMemo } from "react";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useState } from "react";
-import bulgogi from "@/assets/bulgogi-menu.jpg";
-import bibimbap from "@/assets/bibimbap-menu.jpg";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Search, Plus, Heart } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+
+type MenuItem = {
+  id: string; name: string; description: string | null; price: number;
+  category: string; image_url: string | null; dietary_tags: string[] | null;
+  featured: boolean; spicy: boolean; available: boolean;
+};
 
 const Menu = () => {
+  const [items, setItems] = useState<MenuItem[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const { addToCart } = useCart();
+  const { user } = useAuth();
 
-  const categories = [
-    { id: "all", label: "All Items" },
-    { id: "appetizers", label: "Appetizers" },
-    { id: "mains", label: "Main Dishes" },
-    { id: "drinks", label: "Drinks" },
-    { id: "desserts", label: "Desserts" },
-  ];
+  useEffect(() => {
+    supabase.from("menu_items").select("*").eq("available", true).order("featured", { ascending: false })
+      .then(({ data }) => { setItems((data as any) ?? []); setLoading(false); });
+  }, []);
 
-  const menuItems = [
-    {
-      id: 1,
-      name: "Bulgogi BBQ",
-      description: "Tender marinated beef grilled to perfection with Korean spices",
-      price: "$24.99",
-      category: "mains",
-      image: bulgogi,
-      spicy: false,
-    },
-    {
-      id: 2,
-      name: "Bibimbap",
-      description: "Rice bowl with seasoned vegetables, meat, and fried egg",
-      price: "$18.99",
-      category: "mains",
-      image: bibimbap,
-      spicy: true,
-    },
-    {
-      id: 3,
-      name: "Kimchi Pancake",
-      description: "Crispy pancake made with fermented kimchi and scallions",
-      price: "$12.99",
-      category: "appetizers",
-      image: bibimbap, // placeholder
-      spicy: true,
-    },
-    {
-      id: 4,
-      name: "Korean Fried Chicken",
-      description: "Double-fried chicken with sweet and spicy glaze",
-      price: "$19.99",
-      category: "mains",
-      image: bulgogi, // placeholder
-      spicy: true,
-    },
-    {
-      id: 5,
-      name: "Mandu Dumplings",
-      description: "Steamed dumplings filled with pork and vegetables",
-      price: "$14.99",
-      category: "appetizers",
-      image: bibimbap, // placeholder
-      spicy: false,
-    },
-    {
-      id: 6,
-      name: "Soju",
-      description: "Traditional Korean rice wine",
-      price: "$8.99",
-      category: "drinks",
-      image: bulgogi, // placeholder
-      spicy: false,
-    },
-  ];
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("user_preferences").select("favorite_items").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => setFavorites(data?.favorite_items ?? []));
+  }, [user]);
 
-  const filteredItems = activeCategory === "all" 
-    ? menuItems 
-    : menuItems.filter(item => item.category === activeCategory);
+  const toggleFavorite = async (id: string) => {
+    if (!user) return toast.error("Sign in to save favorites");
+    const next = favorites.includes(id) ? favorites.filter(x => x !== id) : [...favorites, id];
+    setFavorites(next);
+    await supabase.from("user_preferences").upsert({ user_id: user.id, favorite_items: next });
+  };
+
+  const categories = useMemo(() => {
+    const set = new Set(items.map(i => i.category));
+    return ["all", ...Array.from(set)];
+  }, [items]);
+
+  const filtered = items.filter(i =>
+    (activeCategory === "all" || i.category === activeCategory) &&
+    (query === "" || i.name.toLowerCase().includes(query.toLowerCase()))
+  );
+
+  const featured = items.filter(i => i.featured).slice(0, 3);
 
   return (
     <div className="min-h-screen">
       <Navigation />
-      
-      {/* Header */}
-      <section className="py-20 korean-pattern">
+      <section className="py-16 korean-pattern">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6 elegant-text">
-            Our Menu
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover authentic Korean flavors crafted with traditional recipes and the finest ingredients
-          </p>
+          <h1 className="text-5xl font-bold mb-4 elegant-text">Our Menu</h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Authentic Korean flavors, crafted with tradition</p>
         </div>
       </section>
 
-      {/* Category Filters */}
-      <section className="py-8 bg-card">
-        <div className="container mx-auto px-4">
+      {featured.length > 0 && (
+        <section className="py-10 bg-card/30">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold mb-6">⭐ Featured</h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              {featured.map(item => (
+                <Card key={item.id} className="food-card-hover overflow-hidden border-primary/30">
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-bold text-primary">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{item.description}</p>
+                    <div className="flex justify-between items-center mt-4">
+                      <span className="text-2xl font-bold text-accent">${Number(item.price).toFixed(2)}</span>
+                      <Button size="sm" onClick={() => addToCart(item.id)}><Plus className="h-4 w-4" />Add</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="py-8 bg-card/50 border-y border-border sticky top-16 z-30 backdrop-blur-md">
+        <div className="container mx-auto px-4 space-y-4">
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input className="pl-10" placeholder="Search dishes…" value={query} onChange={e => setQuery(e.target.value)} />
+          </div>
           <div className="flex flex-wrap justify-center gap-2">
-            {categories.map((category) => (
-              <Button
-                key={category.id}
-                variant={activeCategory === category.id ? "default" : "outline"}
-                onClick={() => setActiveCategory(category.id)}
-                className="transition-all duration-200"
-              >
-                {category.label}
+            {categories.map(c => (
+              <Button key={c} variant={activeCategory === c ? "default" : "outline"} size="sm" onClick={() => setActiveCategory(c)}>
+                {c.charAt(0).toUpperCase() + c.slice(1)}
               </Button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Menu Items */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredItems.map((item) => (
-              <Card key={item.id} className="food-card-hover overflow-hidden">
-                <div className="aspect-square overflow-hidden">
-                  <img 
-                    src={item.image} 
-                    alt={item.name} 
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-xl font-bold text-primary">{item.name}</h3>
-                    {item.spicy && (
-                      <span className="text-primary text-lg">🌶️</span>
-                    )}
-                  </div>
-                  <p className="text-muted-foreground mb-4 text-sm">
-                    {item.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-accent">{item.price}</span>
-                    <Button variant="outline" size="sm">
-                      Add to Order
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {loading ? (
+            <p className="text-center text-muted-foreground">Loading menu…</p>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map(item => (
+                <Card key={item.id} className="food-card-hover overflow-hidden">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-xl font-bold">{item.name} {item.spicy && "🌶️"}</h3>
+                      <button onClick={() => toggleFavorite(item.id)}>
+                        <Heart className={`h-5 w-5 ${favorites.includes(item.id) ? "fill-primary text-primary" : "text-muted-foreground"}`} />
+                      </button>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">{item.description}</p>
+                    <div className="flex gap-1 mt-3 flex-wrap">
+                      {item.dietary_tags?.map(t => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
+                    </div>
+                    <div className="flex justify-between items-center mt-4">
+                      <span className="text-2xl font-bold text-accent">${Number(item.price).toFixed(2)}</span>
+                      <Button size="sm" onClick={() => addToCart(item.id)}><Plus className="h-4 w-4 mr-1" />Add</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+          {filtered.length === 0 && !loading && (
+            <p className="text-center text-muted-foreground">No items found.</p>
+          )}
         </div>
       </section>
+      <Footer />
     </div>
   );
 };
