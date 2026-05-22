@@ -66,9 +66,12 @@ const Admin = () => {
     <div className="min-h-screen">
       <Navigation />
       <div className="container mx-auto px-4 py-12">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
           <h1 className="text-4xl font-bold elegant-text">Admin Dashboard</h1>
-          <Button variant="outline" onClick={handleLogout}><LogOut className="h-4 w-4 mr-2" />Sign out</Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={() => navigate("/")}>← Back to website</Button>
+            <Button variant="outline" onClick={handleLogout}><LogOut className="h-4 w-4 mr-2" />Sign out</Button>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-4 gap-4 mb-8">
