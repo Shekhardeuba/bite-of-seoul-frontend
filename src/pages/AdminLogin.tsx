@@ -16,7 +16,7 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (user && isAdmin) return <Navigate to="/admin" replace />;
+  if (user && isAdmin) return <Navigate to="/admin-dashboard" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +34,7 @@ const AdminLogin = () => {
       return toast.error("This account does not have admin access.");
     }
     toast.success("Welcome, admin");
-    navigate("/admin");
+    navigate("/admin-dashboard");
   };
 
   return (
