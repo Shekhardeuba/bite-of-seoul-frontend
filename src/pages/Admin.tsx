@@ -107,6 +107,7 @@ const Admin = () => {
             <p className="text-muted-foreground mt-1">Analytics & operations</p>
           </div>
           <div className="flex gap-2">
+            <Button variant="default" onClick={() => navigate("/dashboard")}>📊 Analytics Dashboard</Button>
             <Button variant="ghost" onClick={() => navigate("/")}>← Back to website</Button>
             <Button variant="outline" onClick={handleLogout}><LogOut className="h-4 w-4 mr-2" />Sign out</Button>
           </div>
