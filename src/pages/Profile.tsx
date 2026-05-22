@@ -100,6 +100,41 @@ const Profile = () => {
           <Button onClick={save} disabled={loading}>{loading ? "Saving…" : "Save changes"}</Button>
         </CardContent></Card>
 
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card><CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Recent orders</h2>
+            {orders.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No orders yet.</p>
+            ) : (
+              <ul className="space-y-2">
+                {orders.map(o => (
+                  <li key={o.id} className="flex justify-between text-sm border-b border-border pb-2">
+                    <span>{new Date(o.created_at).toLocaleDateString()} · {o.order_type}</span>
+                    <span className="font-semibold">${Number(o.total).toFixed(2)} <Badge variant="outline" className="ml-2">{o.status}</Badge></span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent></Card>
+
+          <Card><CardContent className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Your reservations</h2>
+            {reservations.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No reservations yet.</p>
+            ) : (
+              <ul className="space-y-2">
+                {reservations.map(r => (
+                  <li key={r.id} className="flex justify-between text-sm border-b border-border pb-2">
+                    <span>{r.reservation_date} · {r.reservation_time}</span>
+                    <span>{r.party_size} guests <Badge variant="outline" className="ml-2">{r.status}</Badge></span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent></Card>
+        </div>
+
+
         {recs.length > 0 && (
           <Card><CardContent className="p-6">
             <h2 className="text-2xl font-bold mb-4">Recommended for you</h2>
