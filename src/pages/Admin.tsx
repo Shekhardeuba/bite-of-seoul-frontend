@@ -73,7 +73,7 @@ const Admin = () => {
                   <p className="font-semibold">${Number(o.total).toFixed(2)} · {o.order_type}</p>
                   <p className="text-sm text-muted-foreground">{new Date(o.created_at).toLocaleString()} · {o.order_items?.length ?? 0} items</p>
                 </div>
-                <Select value={o.status} onValueChange={(v) => updateOrder(o.id, v)}>
+                <Select value={o.status} onValueChange={(v) => updateOrder(o.id, v as any)}>
                   <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                   <SelectContent>{ORDER_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
@@ -88,7 +88,7 @@ const Admin = () => {
                   <p className="font-semibold">{r.guest_name} · {r.party_size} guests</p>
                   <p className="text-sm text-muted-foreground">{r.reservation_date} · {r.reservation_time}</p>
                 </div>
-                <Select value={r.status} onValueChange={(v) => updateReservation(r.id, v)}>
+                <Select value={r.status} onValueChange={(v) => updateReservation(r.id, v as any)}>
                   <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                   <SelectContent>{RES_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
