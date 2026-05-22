@@ -13,7 +13,6 @@ import {
   fetchOrders, fetchProfiles, fetchCartItems, fetchMenuItems,
   updateOrderStatus, DateRange,
 } from "@/services/adminService";
-import { supabase } from "@/integrations/supabase/client";
 
 const STATUS_FILTERS = ["all", "received", "preparing", "ready", "delivered", "cancelled"];
 
