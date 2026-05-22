@@ -136,6 +136,17 @@ const Admin = () => {
               </CardContent></Card>
             ))}
           </TabsContent>
+
+          <TabsContent value="popular" className="space-y-3">
+            {popular.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No order data yet.</p>
+            ) : popular.map(p => (
+              <Card key={p.name}><CardContent className="p-4 flex justify-between">
+                <span className="font-semibold">{p.name}</span>
+                <Badge>{p.qty} sold</Badge>
+              </CardContent></Card>
+            ))}
+          </TabsContent>
         </Tabs>
       </div>
       <Footer />
