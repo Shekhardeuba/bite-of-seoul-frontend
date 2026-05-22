@@ -73,7 +73,7 @@ const Admin = () => {
                   <p className="font-semibold">${Number(o.total).toFixed(2)} · {o.order_type}</p>
                   <p className="text-sm text-muted-foreground">{new Date(o.created_at).toLocaleString()} · {o.order_items?.length ?? 0} items</p>
                 </div>
-                <Select value={o.status} onValueChange={(v) => updateOrder(o.id, v as any)}>
+                <Select value={o.status} onValueChange={(v: string) => updateOrder(o.id, v as typeof ORDER_STATUSES[number])}>
                   <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                   <SelectContent>{ORDER_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
