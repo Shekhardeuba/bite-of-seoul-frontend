@@ -9,20 +9,28 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
+import { Sparkles, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const DIETARY = ["vegetarian", "vegan", "gluten-free", "halal", "spicy-lover"];
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [recs, setRecs] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [reservations, setReservations] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user) return;
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()
       .then(({ data }) => setProfile(data));
+    supabase.from("orders").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5)
+      .then(({ data }) => setOrders(data ?? []));
+    supabase.from("reservations").select("*").eq("user_id", user.id).order("reservation_date", { ascending: false }).limit(5)
+      .then(({ data }) => setReservations(data ?? []));
   }, [user]);
 
   useEffect(() => {
@@ -32,6 +40,12 @@ const Profile = () => {
     if (tags.length) q = q.overlaps("dietary_tags", tags);
     q.then(({ data }) => setRecs(data ?? []));
   }, [profile]);
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success("Signed out");
+    navigate("/");
+  };
 
   const save = async () => {
     if (!user || !profile) return;
@@ -55,7 +69,10 @@ const Profile = () => {
     <div className="min-h-screen">
       <Navigation />
       <div className="container mx-auto px-4 py-12 max-w-4xl space-y-6">
-        <h1 className="text-4xl font-bold elegant-text">Profile</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold elegant-text">Profile</h1>
+          <Button variant="outline" onClick={handleLogout}><LogOut className="h-4 w-4 mr-2" />Sign out</Button>
+        </div>
 
         <Card className="border-primary/40 shadow-elegant">
           <CardContent className="p-6 flex items-center justify-between">
