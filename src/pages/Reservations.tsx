@@ -1,229 +1,85 @@
+import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Footer from "@/components/Footer";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const Reservations = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    date: "",
-    time: "",
-    guests: "",
-    specialRequests: "",
-  });
-  
-  const { toast } = useToast();
+  const { user } = useAuth();
+  const [form, setForm] = useState({ guest_name: "", party_size: 2, reservation_date: "", reservation_time: "", occasion: "" });
+  const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState<any[]>([]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const loadHistory = () => {
+    if (!user) return;
+    supabase.from("reservations").select("*").eq("user_id", user.id).order("reservation_date", { ascending: false })
+      .then(({ data }) => setHistory(data ?? []));
   };
+  useEffect(loadHistory, [user]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: This will send POST to API when backend is ready
-    console.log("Reservation data:", formData);
-    toast({
-      title: "Reservation Request Sent!",
-      description: "We'll contact you within 24 hours to confirm your reservation.",
-    });
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      date: "",
-      time: "",
-      guests: "",
-      specialRequests: "",
-    });
+    if (!user) return toast.error("Please sign in");
+    setLoading(true);
+    const { error } = await supabase.from("reservations").insert({ ...form, user_id: user.id });
+    setLoading(false);
+    if (error) return toast.error(error.message);
+    toast.success("Reservation requested!");
+    setForm({ guest_name: "", party_size: 2, reservation_date: "", reservation_time: "", occasion: "" });
+    loadHistory();
   };
 
   return (
     <div className="min-h-screen">
       <Navigation />
-      
-      {/* Header */}
-      <section className="py-20 korean-pattern">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6 elegant-text">
-            Make a Reservation
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Reserve your table for an unforgettable Korean dining experience
-          </p>
-        </div>
+      <section className="py-16 korean-pattern text-center">
+        <h1 className="text-5xl font-bold elegant-text">Reservations</h1>
+        <p className="text-muted-foreground mt-3">Book your table for an authentic Korean experience</p>
       </section>
+      <div className="container mx-auto px-4 py-12 max-w-4xl grid md:grid-cols-2 gap-8">
+        <Card><CardContent className="p-6">
+          <h2 className="text-2xl font-bold mb-4">Make a reservation</h2>
+          {!user ? (
+            <p className="text-muted-foreground">Please <Link to="/auth" className="text-primary underline">sign in</Link> to book a table.</p>
+          ) : (
+            <form onSubmit={submit} className="space-y-4">
+              <div><Label>Guest name</Label><Input required value={form.guest_name} onChange={e => setForm({ ...form, guest_name: e.target.value })} /></div>
+              <div><Label>Party size</Label><Input type="number" min={1} max={20} required value={form.party_size} onChange={e => setForm({ ...form, party_size: Number(e.target.value) })} /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Date</Label><Input type="date" required value={form.reservation_date} onChange={e => setForm({ ...form, reservation_date: e.target.value })} /></div>
+                <div><Label>Time</Label><Input type="time" required value={form.reservation_time} onChange={e => setForm({ ...form, reservation_time: e.target.value })} /></div>
+              </div>
+              <div><Label>Special occasion</Label><Input value={form.occasion} onChange={e => setForm({ ...form, occasion: e.target.value })} placeholder="Birthday, anniversary…" /></div>
+              <Button type="submit" className="w-full" disabled={loading}>{loading ? "Booking…" : "Request reservation"}</Button>
+            </form>
+          )}
+        </CardContent></Card>
 
-      {/* Reservation Form */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl text-center text-primary">
-                  Reservation Details
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full Name *</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="Enter your full name"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="Enter your email"
-                      />
-                    </div>
+        <Card><CardContent className="p-6">
+          <h2 className="text-2xl font-bold mb-4">Your reservations</h2>
+          {history.length === 0 ? <p className="text-muted-foreground">No reservations yet.</p> : (
+            <div className="space-y-3">
+              {history.map(r => (
+                <div key={r.id} className="border border-border rounded-lg p-3 flex justify-between items-center">
+                  <div>
+                    <p className="font-semibold">{r.reservation_date} · {r.reservation_time}</p>
+                    <p className="text-sm text-muted-foreground">{r.guest_name} · {r.party_size} guests</p>
                   </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number *</Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="Enter your phone number"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="guests">Number of Guests *</Label>
-                      <Input
-                        id="guests"
-                        name="guests"
-                        type="number"
-                        min="1"
-                        max="20"
-                        value={formData.guests}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="How many guests?"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="date">Preferred Date *</Label>
-                      <Input
-                        id="date"
-                        name="date"
-                        type="date"
-                        value={formData.date}
-                        onChange={handleInputChange}
-                        required
-                        min={new Date().toISOString().split('T')[0]}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="time">Preferred Time *</Label>
-                      <Input
-                        id="time"
-                        name="time"
-                        type="time"
-                        value={formData.time}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="specialRequests">Special Requests</Label>
-                    <Textarea
-                      id="specialRequests"
-                      name="specialRequests"
-                      value={formData.specialRequests}
-                      onChange={handleInputChange}
-                      placeholder="Any dietary restrictions, allergies, or special occasions we should know about?"
-                      rows={4}
-                    />
-                  </div>
-
-                  <Button type="submit" className="w-full" size="lg">
-                    Submit Reservation Request
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Restaurant Hours */}
-      <section className="py-16 bg-secondary/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-8 elegant-text">
-              Restaurant Hours
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-bold text-primary mb-4">Dining Hours</h3>
-                  <div className="space-y-2 text-muted-foreground">
-                    <div className="flex justify-between">
-                      <span>Monday - Thursday</span>
-                      <span>5:00 PM - 10:00 PM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Friday - Saturday</span>
-                      <span>5:00 PM - 11:00 PM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Sunday</span>
-                      <span>4:00 PM - 9:00 PM</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-bold text-primary mb-4">Contact Information</h3>
-                  <div className="space-y-2 text-muted-foreground">
-                    <div>📞 (555) 123-4567</div>
-                    <div>📧 reservations@biteofseoul.com</div>
-                    <div>📍 123 Korean Street, City, State 12345</div>
-                  </div>
-                  <p className="mt-4 text-sm text-muted-foreground">
-                    We recommend making reservations, especially for weekends and special occasions.
-                  </p>
-                </CardContent>
-              </Card>
+                  <Badge variant="outline">{r.status}</Badge>
+                </div>
+              ))}
             </div>
-          </div>
-        </div>
-      </section>
+          )}
+        </CardContent></Card>
+      </div>
+      <Footer />
     </div>
   );
 };
