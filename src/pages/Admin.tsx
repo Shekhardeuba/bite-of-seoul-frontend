@@ -88,7 +88,7 @@ const Admin = () => {
                   <p className="font-semibold">{r.guest_name} · {r.party_size} guests</p>
                   <p className="text-sm text-muted-foreground">{r.reservation_date} · {r.reservation_time}</p>
                 </div>
-                <Select value={r.status} onValueChange={(v) => updateReservation(r.id, v as any)}>
+                <Select value={r.status} onValueChange={(v: string) => updateReservation(r.id, v as typeof RES_STATUSES[number])}>
                   <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                   <SelectContent>{RES_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
