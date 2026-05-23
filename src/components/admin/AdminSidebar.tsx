@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, ShoppingBag, UtensilsCrossed, Users, ShoppingCart, LogOut, X } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, UtensilsCrossed, Users, ShoppingCart, CalendarDays, LogOut, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const items = [
   { to: "/admin-dashboard", label: "Dashboard", icon: LayoutDashboard, section: "dashboard" },
   { to: "/admin-dashboard?tab=orders", label: "Orders", icon: ShoppingBag, section: "orders" },
+  { to: "/admin-dashboard?tab=reservations", label: "Reservations", icon: CalendarDays, section: "reservations" },
   { to: "/admin-dashboard?tab=menu", label: "Menu Items", icon: UtensilsCrossed, section: "menu" },
   { to: "/admin-dashboard?tab=users", label: "Users", icon: Users, section: "users" },
   { to: "/admin-dashboard?tab=cart", label: "Cart Analytics", icon: ShoppingCart, section: "cart" },
