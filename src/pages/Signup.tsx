@@ -23,7 +23,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (user) return <Navigate to={isAdmin ? "/admin" : "/profile"} replace />;
+  if (user) return <Navigate to={isAdmin ? "/admin-dashboard" : "/profile"} replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

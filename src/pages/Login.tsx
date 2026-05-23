@@ -15,7 +15,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (user && !authLoading) return <Navigate to={isAdmin ? "/admin" : "/profile"} replace />;
+  if (user && !authLoading) return <Navigate to={isAdmin ? "/admin-dashboard" : "/profile"} replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +29,7 @@ const Login = () => {
       .from("user_roles").select("role").eq("user_id", data.user!.id).eq("role", "admin").maybeSingle();
     setLoading(false);
     toast.success("Welcome back!");
-    navigate(roleRow ? "/admin" : "/profile");
+    navigate(roleRow ? "/admin-dashboard" : "/profile");
   };
 
   return (

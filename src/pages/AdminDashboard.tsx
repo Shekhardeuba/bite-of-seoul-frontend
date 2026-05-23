@@ -9,6 +9,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminSummaryCards from "@/components/admin/AdminSummaryCards";
 import AdminCharts from "@/components/admin/AdminCharts";
 import RecentOrdersTable from "@/components/admin/RecentOrdersTable";
+import MenuManager from "@/components/admin/MenuManager";
 import {
   fetchOrders, fetchProfiles, fetchCartItems, fetchMenuItems,
   updateOrderStatus, DateRange,
@@ -244,26 +245,7 @@ export default function AdminDashboard() {
                 </Card>
               )}
 
-              {section === "menu" && (
-                <Card className="rounded-xl shadow-sm">
-                  <CardHeader><CardTitle className="text-base">Menu Items ({menu.length})</CardTitle></CardHeader>
-                  <CardContent className="p-0 overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="bg-muted/50"><tr className="text-left">
-                        <th className="p-3 font-medium">Name</th><th className="p-3 font-medium">Category</th>
-                        <th className="p-3 font-medium">Price</th><th className="p-3 font-medium">Available</th>
-                      </tr></thead>
-                      <tbody>{menu.map(m => (
-                        <tr key={m.id} className="border-t">
-                          <td className="p-3 font-medium">{m.name}</td>
-                          <td className="p-3 text-muted-foreground">{m.category}</td>
-                          <td className="p-3">${Number(m.price).toFixed(2)}</td>
-                          <td className="p-3">{m.available ? "✅" : "❌"}</td>
-                        </tr>))}</tbody>
-                    </table>
-                  </CardContent>
-                </Card>
-              )}
+              {section === "menu" && <MenuManager />}
 
               {section === "users" && (
                 <Card className="rounded-xl shadow-sm">
