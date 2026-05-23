@@ -10,6 +10,7 @@ import AdminSummaryCards from "@/components/admin/AdminSummaryCards";
 import AdminCharts from "@/components/admin/AdminCharts";
 import RecentOrdersTable from "@/components/admin/RecentOrdersTable";
 import MenuManager from "@/components/admin/MenuManager";
+import ReservationsManager from "@/components/admin/ReservationsManager";
 import {
   fetchOrders, fetchProfiles, fetchCartItems, fetchMenuItems,
   updateOrderStatus, DateRange,
