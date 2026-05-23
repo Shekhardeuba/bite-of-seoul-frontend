@@ -248,6 +248,8 @@ export default function AdminDashboard() {
 
               {section === "menu" && <MenuManager />}
 
+              {section === "reservations" && <ReservationsManager />}
+
               {section === "users" && (
                 <Card className="rounded-xl shadow-sm">
                   <CardHeader><CardTitle className="text-base">Users ({profiles.length})</CardTitle></CardHeader>
